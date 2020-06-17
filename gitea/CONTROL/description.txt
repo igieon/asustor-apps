@@ -1,0 +1,34 @@
+Gitea - Git with a cup of tea
+A painless self-hosted Git service.
+
+Installation notes:
+
+1. Preinstall
+
+Please create a database in MariaDB ( you can use phpmyadmin to create an user name: gitea, and has
+
+the permission of databasae 'gitea' )
+
+Go to ADM\Services\MariaDB to enable MariaDB remote access
+
+2. After install the App.
+
+You can launch Gitea icon to visit http://nas_ip:3000/install to process the installation.
+
+In the installation page,
+
+Input
+
+host: nas_ip:3306
+
+account: gitea
+
+password: "what password of gogs account in MariaDB"
+
+monitoring port : 3000
+
+Application URL: http://nasip:3000
+
+Press the installation button to start install.
+
+3. After installation is finished, you can open the http://nas_ip:3000 to manage the Gitea

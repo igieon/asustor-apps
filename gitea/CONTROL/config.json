@@ -1,0 +1,45 @@
+{
+   "general":{
+      "package":"Gitea",
+      "name":"Gitea",
+      "version":"1.11.6",
+      "depends":[
+         "docker-ce(>=18.03.1.r1)"
+      ],
+      "conflicts":[],
+      "developer":"Gitea",
+      "maintainer":"iGi",
+      "email":"ignjic@gmail.com",
+      "website":"https://gitea.io/",
+      "architecture":"x86-64",
+      "firmware":"3.0.0"
+      },
+      "adm-desktop": {
+			"app": {
+				"port": 3000,
+				"protocol": "http",
+				"type": "custom",
+				"url": "/" 
+			},
+			"privilege": {
+				"accessible": "users", 
+				"customizable": true 
+			} 
+                 
+      },
+      "register":{
+			"share-folder":[
+             {
+				"name":"gitea_data",
+				"description":"Gitea data volume"
+             } 
+			],
+			"boot-priority":{
+				"start-order":60,
+				"stop-order":40
+			},
+            "port":[
+             "3000", "10022"
+            ]
+      }
+}
