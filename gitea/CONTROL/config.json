@@ -2,7 +2,7 @@
    "general":{
       "package":"Gitea",
       "name":"Gitea",
-      "version":"1.11.6",
+      "version":"1.12.0",
       "depends":[
          "docker-ce(>=18.03.1.r1)"
       ],
@@ -16,7 +16,7 @@
       },
       "adm-desktop": {
 			"app": {
-				"port": 3000,
+				"port": 13000,
 				"protocol": "http",
 				"type": "custom",
 				"url": "/" 
@@ -39,7 +39,7 @@
 				"stop-order":40
 			},
             "port":[
-             "3000", "10022"
+             "13000", "10022"
             ]
       }
 }

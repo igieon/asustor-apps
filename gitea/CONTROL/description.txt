@@ -13,7 +13,7 @@ Go to ADM\Services\MariaDB to enable MariaDB remote access
 
 2. After install the App.
 
-You can launch Gitea icon to visit http://nas_ip:3000/install to process the installation.
+You can launch Gitea icon to visit http://nas_ip:13000/install to process the installation.
 
 In the installation page,
 
@@ -23,12 +23,12 @@ host: nas_ip:3306
 
 account: gitea
 
-password: "what password of gogs account in MariaDB"
+password: "what password of gitea account in MariaDB"
 
-monitoring port : 3000
+monitoring port : 13000
 
-Application URL: http://nasip:3000
+Application URL: http://nasip:13000
 
 Press the installation button to start install.
 
-3. After installation is finished, you can open the http://nas_ip:3000 to manage the Gitea
+3. After installation is finished, you can open the http://nas_ip:13000 to manage the Gitea
