@@ -4,7 +4,7 @@
 case "$1" in
     start)
         echo "Start Gitea  container ..."
-        docker start Gitea 
+        docker start Gitea
         sleep 10                        
         ;;
     stop)

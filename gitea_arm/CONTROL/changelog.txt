@@ -1,1 +1,3 @@
-update to version 1.12.1
+update to version 1.14.1
+
+- change to use latest gitea tag
