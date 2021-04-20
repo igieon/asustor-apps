@@ -13,14 +13,10 @@ RUN apt-get update && apt-get install -y ca-certificates && \
         /var/lib/apt/lists/* 
 
 
-WORKDIR /seafile-client
+COPY start.sh /start.sh
 
-COPY start.sh /seafile-client/start.sh
-
-RUN chmod +x /seafile-client/start.sh && \
+RUN chmod +x /start.sh && \
     useradd -U -d /seafile-client -s /bin/bash seafile && \
-    usermod -G users seafile && \
-    chown seafile:seafile -R /seafile-client && \
-    su - seafile -c "seaf-cli init -d /seafile-client"
+    usermod -G users seafile
 
-CMD ["./start.sh"]
+CMD ["/start.sh"]

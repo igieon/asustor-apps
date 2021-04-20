@@ -23,5 +23,3 @@ services:
      - SEAFILE_GID=100
    volumes:
       - /volume1/Docker/seafile-sync:/data
-    depends_on:
-      - seafile

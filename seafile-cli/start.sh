@@ -106,6 +106,8 @@ keep_in_foreground() {
 }
 
 setup_uid
+chown seafile:seafile -R /seafile-client
+su - seafile -c "seaf-cli init -d /seafile-client"
 start_seafile
 setup_lib_sync
 keep_in_foreground
