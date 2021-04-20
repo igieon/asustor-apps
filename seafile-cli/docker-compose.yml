@@ -1,0 +1,27 @@
+version: '2.0'
+
+
+services:
+ seafile-cli:
+   build: .
+   image: igi/seafile-client:latest
+   restart: always
+   container_name: seafile-cli
+   logging:
+     driver: "json-file"
+     options:
+       max-size: "2000k"
+       max-file: "10"    
+   environment:
+     - LIBRARY_ID=a32ca57c-4592-4e10-af21-a20a955abcdd:7c3b98c3-1e8a-4566-ba80-92758614260f:d4882dd5-772d-4d02-a023-3e5dc5e0bd88:49a2dfa6-2f69-4cec-ab5b-e86fdd2db3cc:095c6e3a-76e7-4224-a50e-4b6466009f94
+     - SERVER_URL=http://seafile
+     - SERVER_PORT=80
+     - USERNAME=nas@nas.nas
+     - PASSWORD=nas
+     - DATA_DIR=/data
+     - SEAFILE_UID=999
+     - SEAFILE_GID=100
+   volumes:
+      - /volume1/Docker/seafile-sync:/data
+    depends_on:
+      - seafile
