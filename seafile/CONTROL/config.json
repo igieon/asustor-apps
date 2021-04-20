@@ -1,0 +1,39 @@
+{
+   "general":{
+      "package":"seafile",
+      "name":"seafile",
+      "version":"8.0.4",
+      "depends":[
+         "docker-ce(>=18.03.1.r1)"
+      ],
+      "conflicts":[],
+      "developer":"Seafile",
+      "maintainer":"iGi",
+      "email":"ignjic@gmail.com",
+      "website":"https://www.seafile.com/en/home/",
+      "architecture":"x86-64",
+      "firmware":"3.0.0"
+      },
+      "adm-desktop": {
+			"app": {
+				"port": 5080,
+				"protocol": "http",
+				"type": "custom",
+				"url": "/" 
+			},
+			"privilege": {
+				"accessible": "users", 
+				"customizable": true 
+			} 
+                 
+      },
+      "register":{
+			"boot-priority":{
+				"start-order":60,
+				"stop-order":40
+			},
+            "port":[
+             "5080"
+            ]
+      }
+}

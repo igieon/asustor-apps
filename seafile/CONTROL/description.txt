@@ -1,0 +1,7 @@
+Cross Platform File Syncing
+Seafile organize files into libraries. Each library can be synced into any desktop computer, including Windows, Mac and Linux. User can also selectively sync any folder. Seafile provides very fast file syncing. Tens of thousands of small files can be synced in a minute.
+
+Seafile base url:http://nasip:5080
+Login: me@example.com/asecret
+
+Don't forget properly configure http://nasip:5080/sys/web-settings/

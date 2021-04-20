@@ -6,4 +6,6 @@
 ## Build
 ```bash
 sudo ./apkg-tools.py  create gitea
+sudo ./apkg-tools.py  create gitea_arm
+sudo ./apkg-tools.py  create seafile
 ```
