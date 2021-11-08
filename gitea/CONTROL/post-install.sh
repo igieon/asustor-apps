@@ -1,6 +1,6 @@
 #!/bin/sh
 echo "post-install"
-docker pull gitea/gitea:latest
+docker pull gitea/gitea:1.15
 
 CONTAINER_TEST=$(docker container ls -a | grep Gitea | awk '{print $1}')
 
@@ -12,7 +12,7 @@ docker create -i -t --name=Gitea \
 	--restart=unless-stopped \
 	-p 10022:22 -p 13000:3000 \
 	-v /volume1/gitea_data:/data \
-	gitea/gitea:latest
+	gitea/gitea:1.15
 
 
 case "$APKG_PKG_STATUS" in

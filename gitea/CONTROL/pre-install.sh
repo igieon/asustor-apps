@@ -2,4 +2,4 @@
 
 echo "pre-install"
 
-docker pull gitea/gitea:latest
+docker pull gitea/gitea:1.15
