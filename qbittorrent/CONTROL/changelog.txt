@@ -1,0 +1,59 @@
+Version: 4.4.1.r01
+
+- Update to Docker version 4.4.1.
+- Enable HTTPS connection and apply ADM SSL certificate by default.
+- Binding the shared folder root of NAS to the "/shared" of qBittorrent.
+
+Version: 4.4.0.r02
+
+- Enable HTTPS connection and apply ADM SSL certificate by default now.
+- Update to Docker version 4.4.0.
+
+Version: 4.4.0.r01
+
+- Update to Docker version 4.4.0.
+
+Version: 4.3.9.r01
+
+- Update to Docker version 4.3.9.
+
+Version: 4.3.8.r01
+
+- Update to Docker version 4.3.8.
+
+Version: 4.3.7.r01
+
+- Update to Docker version 4.3.7.
+
+Version: 4.3.5.r01
+
+- Update to Docker version 4.3.5.
+
+Version: 4.3.3.r01
+
+- Update to Docker version 4.3.3.
+
+Version: 4.3.0.r01
+
+- Update to Docker version 4.3.0.
+
+Version: 4.2.5.r02
+
+- Update version with Docker latest version 4.2.5.
+
+Version: 4.2.5.r01
+
+- Fix the issue that torrent file will be removed while restart service or NAS.
+- Update version with Docker version 4.2.5.
+
+Version: 4.2.1.r01
+
+- Update version with Docker version 4.2.1.
+
+Version: 4.1.8.r02
+
+- Change binding shared folder of "/downloads" and then Radarr and Sonarr can handle files after downloading completed.
+
+Version: 4.1.8.r01
+
+- Initial release with Docker version 4.1.8.

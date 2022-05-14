@@ -1,0 +1,87 @@
+#!/bin/sh
+
+echo "post-install"
+
+# App Central extend timeout, but the timeout seems be counted from post-install, not pre-install, so move "docker pull" to post-install.
+
+docker pull lscr.io/linuxserver/qbittorrent:latest
+
+echo "Completed docker pull"
+
+
+CONTAINER_TEST=$(docker container ls -a | grep qBittorrent | awk '{print $1}')
+
+if [ ! -z $CONTAINER_TEST ]; then
+	docker rm -f $CONTAINER_TEST
+fi
+
+QB_CONF_FILE=/share/Docker/qBittorrent/config/qBittorrent/qBittorrent.conf
+
+# If the conf file is not existed, this should be 1st installed QB, copy default conf directly.
+if [ ! -e $QB_CONF_FILE ]; then
+	cp -f $APKG_PKG_DIR/conf/qBittorrent.conf /share/Docker/qBittorrent/config/qBittorrent/
+	
+	chown -hR admin:administrators $QB_CONF_FILE
+	chmod 0664 $QB_CONF_FILE
+
+else 
+	# If the conf file is existed, need to check if the settings is been writed or not, if not, append these settings into the conf file.
+	HTTPS_ENABLE=$(grep 'WebUI\\HTTPS\\Enabled' $QB_CONF_FILE | sed 's/WebUI\\HTTPS\\Enabled=//g')
+	
+	if [ -z "$HTTPS_ENABLE" ]; then
+
+		sed -i '/WebUI\\Address=/a WebUI\\HTTPS\\KeyPath=\/sslcerts\/ssl.key' $QB_CONF_FILE
+
+		sed -i '/WebUI\\Address=/a WebUI\\HTTPS\\Enabled=false' $QB_CONF_FILE
+
+		sed -i '/WebUI\\Address=/a WebUI\\HTTPS\\CertificatePath=\/sslcerts\/ssl.crt' $QB_CONF_FILE
+
+		sed -i '/WebUI\\Address=/a WebUI\\CSRFProtection=false' $QB_CONF_FILE
+	fi
+fi
+
+
+C_UID=$(id -u admin)
+ADMIN_GID=$(id -g admin)
+
+docker create -i -t --name=qBittorrent \
+	-p 18181:18181 \
+	-p 60001:60001 \
+	-p 60001:60001/udp \
+	-e PUID=$C_UID -e PGID=$ADMIN_GID \
+	-e WEBUI_PORT=18181 \
+	-v /etc/localtime:/etc/localtime:ro \
+	-v /usr/builtin/etc/certificate/:/sslcerts/:ro \
+	-v /share/Docker/qBittorrent/config:/config:rw \
+	-v /share/Download:/downloads:rw \
+	-v /share:/shared:rw \
+	--restart unless-stopped \
+	lscr.io/linuxserver/qbittorrent:latest
+  	
+docker start qBittorrent
+
+
+case "$APKG_PKG_STATUS" in
+	install)
+		;;
+	upgrade)
+		oldim=$(docker images | grep lscr.io/linuxserver/qbittorrent | grep none | awk '{print $3}')
+		echo $oldim
+		
+		if [ ! -z $oldim ]; then 
+			docker rmi -f $oldim
+		fi
+		;;
+	*)
+		;;
+esac
+
+# The followings can be removed from next release.
+imold=$(docker images | grep ghcr.io/linuxserver/qbittorrent | grep latest | awk '{print $3}')
+echo $imold
+		
+if [ ! -z $imold ]; then 
+	docker rmi -f $imold
+fi
+
+exit 0

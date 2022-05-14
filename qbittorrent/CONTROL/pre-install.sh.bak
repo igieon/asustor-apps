@@ -1,0 +1,49 @@
+#!/bin/sh
+
+echo "pre-install"
+
+QB_FOLDER=/share/Docker/qBittorrent
+QB_CONF_FOLDER=/share/Docker/qBittorrent/config
+QB_CONF_QB_FOLDER=/share/Docker/qBittorrent/config/qBittorrent
+QB_CONF_FILE=/share/Docker/qBittorrent/config/qBittorrent/qBittorrent.conf
+
+# 1st time install this app, copy default qBittorrent.conf to avoid random error happened, and default enable HTTPS.
+if [ ! -d $QB_FOLDER ]; then
+	mkdir -p $QB_FOLDER
+fi
+
+# Make sure configuration directory exists
+if [ ! -d $QB_CONF_FOLDER ]; then
+	mkdir -p $QB_CONF_FOLDER
+	mkdir -p $QB_CONF_QB_FOLDER
+fi
+
+docker pull lscr.io/linuxserver/qbittorrent:latest
+
+case "$APKG_PKG_STATUS" in
+	install)
+		;;
+	upgrade)
+		# If qBittorrent.conf existed, make sure to update the configuration and ssl certificate and key file names here if HTTPS is not enabled.
+		if [ -e $QB_CONF_FILE ]; then
+		
+			# Get current HTTPS status first, if it's already enabled, don't need to update the status and certificate/key path
+			HTTPS_ENABLE=$(grep 'WebUI\\HTTPS\\Enabled' $QB_CONF_FILE | sed 's/WebUI\\HTTPS\\Enabled=//g')
+			
+			if [ "$HTTPS_ENABLE" == "false" ]; then			
+				sed -i 's/WebUI\\HTTPS\\Enabled=.*/'"WebUI\\\HTTPS\\\Enabled=false"'/g' $QB_CONF_FILE
+				
+				sed -i 's/WebUI\\HTTPS\\CertificatePath=.*/'"WebUI\\\HTTPS\\\CertificatePath=\/sslcerts\/ssl.crt"'/g' $QB_CONF_FILE
+				
+				sed -i 's/WebUI\\HTTPS\\KeyPath=.*/'"WebUI\\\HTTPS\\\KeyPath=\/sslcerts\/ssl.key"'/g' $QB_CONF_FILE
+				
+				sed -i 's/WebUI\\CSRFProtection=.*/'"WebUI\\\CSRFProtection=false"'/g' $QB_CONF_FILE
+				
+			fi
+		fi
+		;;
+	*)
+		;;
+esac
+
+exit 0

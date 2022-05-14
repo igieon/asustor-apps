@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-# Copyright (c) 2011-2013 Asustor Systems, Inc. All Rights Reserved.
+#!/usr/bin/env python3
+# Copyright (c) 2021-2023 Asustor Systems, Inc. All Rights Reserved.
 
 # -*- coding: utf-8 -*-
 
@@ -16,7 +16,7 @@ import re
 import csv
 
 __author__    = 'Walker Lee <walkerlee@asustor.com>'
-__copyright__ = 'Copyright (C) 2011-2013  ASUSTOR Systems, Inc.  All Rights Reserved.'
+__copyright__ = 'Copyright (C) 2021-2023  ASUSTOR Systems, Inc.  All Rights Reserved.'
 __version__   = '0.1'
 __abs_path__  = os.path.abspath(sys.argv[0])
 __program__   = os.path.basename(__abs_path__)
@@ -45,7 +45,9 @@ class Chdir:
 		os.chdir(self.savedPath)
 
 class Apkg:
-	umask   = 0022
+	mask = 18
+	os.umask(mask)
+
 	tmp_dir = '/tmp'
 
 	tmp_prefix = 'APKG-'
@@ -85,7 +87,7 @@ class Apkg:
 		'group' : 'administrators',
 		'uid'   : 999,
 		'gid'   : 999,
-		'perms' : 0770
+		'perms' : 770
 	}
 
 	def __init__(self):
@@ -110,30 +112,27 @@ class Apkg:
 			with zipfile.ZipFile(apk_file, 'r') as apk_zip:
 				file_list = apk_zip.namelist()
 		except zipfile.BadZipfile:
-			print 'File is not a apk file: %s' % (apk_file)
+			print ('File is not a apk file: %s' % (apk_file))
 			return False
 
 		# check apk file contents
 		if not file_list:
-			print 'File is empty: %s' % (apk_file)
+			print ('File is empty: %s' % (apk_file))
 			return False
 
 		result = True
 		for (key, value) in self.apk_file_contents.items():
 			if value not in file_list:
-				print 'Can\'t found file in apk file: %s' % (value)
+				print ('Can\'t found file in apk file: %s' % (value))
 				result = False
 
 		return result
 
-	# return True for files we want to exclude
-	def __excluded_files(self, file):
-		_return = False
-		# here we're checking to see if the file is 'CONTROL' -
-		# a file don't want included in our tar archive.
-		if file.find('CONTROL') > -1:
-			_return = True
-		return _return
+	# return None for files we want to exclude
+	def __filter_files(self, file: tarfile.TarInfo):
+		if 'CONTROL' in file.name:
+			return None
+		return file
 
 	def __zip_archive(self, apk_file, file_list):
 		with zipfile.ZipFile(apk_file, 'w') as apk_zip:
@@ -148,7 +147,7 @@ class Apkg:
 		# create a tar archive of directory
 		with tarfile.open(tar_file, 'w:gz') as tar:
 			if os.path.basename(tar_file) == self.apk_file_contents['data']:
-				tar.add(path, exclude=self.__excluded_files)
+				tar.add(path, filter=self.__filter_files)
 			else:
 				tar.add(path)
 
@@ -157,7 +156,7 @@ class Apkg:
 			tar.extractall(path)
 
 	def __get_apkg_version(self, version_file):
-		with file(version_file) as f:
+		with open(version_file) as f:
 			version = f.read().rstrip()
 		return version
 
@@ -174,7 +173,7 @@ class Apkg:
 	def __get_app_info(self, control_dir, apkg_version):
 		if apkg_version == '1.0':
 			return self.__get_app_info_v1(control_dir)
-		elif apkg_version == '2.0':
+		elif apkg_version == '2.0' or apkg_version == '2.1':
 			return self.__get_app_info_v2(control_dir)
 		else:
 			return None
@@ -183,13 +182,13 @@ class Apkg:
 		control_dir = app_dir + '/' + self.apk_special_folders['control']
 
 		if not os.path.isdir(control_dir):
-			print '[Not found] CONTROL folder: %s' % (control_dir)
+			print ('[Not found] CONTROL folder: %s' % (control_dir))
 			return False
 
 		config_file = control_dir + '/' + self.apk_control_files['pkg-config']
 
 		if not os.path.isfile(config_file):
-			print '[Not found] config file: %s' % (config_file)
+			print ('[Not found] config file: %s' % (config_file))
 			return False
 
 		# TODO: check icon exist?
@@ -205,10 +204,10 @@ class Apkg:
 		for field in require_fields:
 			try:
 				if app_info['general'][field].strip() == '':
-					print 'Empty field: %s' % (field)
+					print ('Empty field: %s' % (field))
 					return False
 			except KeyError:
-				print 'Missing field: %s' % (field)
+				print ('Missing field: %s' % (field))
 				return False
 
 		return True
@@ -224,7 +223,7 @@ class Apkg:
 		# check folder is exist
 		app_dir = os.path.abspath(folder)
 		if not os.path.isdir(app_dir):
-			print 'Not a directory: %s' % (app_dir)
+			print ('Not a directory: %s' % (app_dir))
 			return -1
 
 		control_dir = app_dir + '/' + self.apk_special_folders['control']
@@ -232,11 +231,11 @@ class Apkg:
 
 		# check package layout is correct
 		if not self.__check_app_layout(app_dir):
-			print 'Invalid App layout: %s' % (app_dir)
+			print ('Invalid App layout: %s' % (app_dir))
 			return -1
 
 		# change file mode and owner
-		os.chmod(control_dir, 0755)
+		os.chmod(control_dir, 0o755)
 		os.chown(control_dir, 0, 0)
 
 		all_files = glob.glob(control_dir + '/*')
@@ -244,26 +243,26 @@ class Apkg:
 		py_files  = glob.glob(control_dir + '/*.py')
 
 		for one_file in all_files:
-			os.chmod(one_file, 0644)
+			os.chmod(one_file, 0o644)
 			os.chown(one_file, 0, 0)
 
 		for one_file in sh_files:
-			os.chmod(one_file, 0755)
+			os.chmod(one_file, 0o755)
 			os.system('dos2unix %s > /dev/null 2>&1' % (one_file))
 
 		for one_file in py_files:
-			os.chmod(one_file, 0755)
+			os.chmod(one_file, 0o755)
 
 		app_info = self.__get_app_info(control_dir, self.apk_format['version'])
 
 		# check config.json fields
 		if not self.__check_app_info_fields(app_info):
-			print 'Invalid App config: %s' % (config_file)
+			print ('Invalid App config: %s' % (config_file))
 			return -1
 
 		# check package field value
 		if not self.__check_app_package_name(app_info['general']['package']):
-			print 'Invalid App package field: %s (valid characters [a-zA-Z0-9.+-])' % ('package')
+			print ('Invalid App package field: %s (valid characters [a-zA-Z0-9.+-])' % ('package'))
 			return -1
 
 		# prepare tmp dir
@@ -305,7 +304,7 @@ class Apkg:
 		# check file is exist
 		apk_file = os.path.abspath(package)
 		if not os.path.isfile(apk_file):
-			print 'Not a file: %s' % (apk_file)
+			print ('Not a file: %s' % (apk_file))
 			return -1
 
 		# check package format (apk: zip format; contain files: apkg-version, control.tar.gz, data.tar.gz)
@@ -339,7 +338,7 @@ class Apkg:
 
 		# error handle
 		if apk_info is None:
-			print 'Extract error: %s' % (apk_file)
+			print ('Extract error: %s' % (apk_file))
 			shutil.rmtree(tmp_dir, ignore_errors=True)
 			return -1
 
@@ -355,7 +354,7 @@ class Apkg:
 			app_dir = dest_dir + '/' + apk_info['general']['name'] + '_' + apk_info['general']['version'] + '_' + apk_info['general']['architecture']
 
 		if os.path.isdir(app_dir):
-			print 'The folder is exist, please remove it: %s' % (app_dir)
+			print ('The folder is exist, please remove it: %s' % (app_dir))
 			shutil.rmtree(tmp_dir, ignore_errors=True)
 			return -1
 		else:
@@ -366,7 +365,7 @@ class Apkg:
 		app_dir = self.extract(package, dest_dir='/tmp')
 
 		if app_dir == -1:
-			print 'Convert error'
+			print ('Convert error')
 			return -1
 
 		control_dir      = app_dir + '/' + self.apk_special_folders['control']
@@ -515,16 +514,16 @@ class Apkg:
 		# cleanup app folder
 		shutil.rmtree(app_dir, ignore_errors=True)
 
-		print 'Convert success: %s' % (apk_file)
+		print ('Convert success: %s' % (apk_file))
 
 	def upload(self, package):
 		# check file is exist
 		abs_path = os.path.abspath(package)
 		if not os.path.isfile(abs_path):
-			print 'Not a file: %s' % (abs_path)
+			print ('Not a file: %s' % (abs_path))
 			return -1
 
-		print 'function not support: %s' % ('upload')
+		print ('function not support: %s' % ('upload'))
 
 # main
 if __name__ == "__main__":

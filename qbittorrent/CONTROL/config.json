@@ -1,0 +1,45 @@
+{
+	"general":{
+		"package":"qbittorrent-docker",
+		"name":"qBittorrent",
+		"version":"4.4.2",
+		"depends":[
+			"docker-ce(>=19.03.8.r5)"
+		],
+		"developer":"The qBittorrent project",
+		"maintainer":"Patrick",
+		"email":"patrickhsu.ast@gmail.com",
+		"website":"https://hub.docker.com/r/linuxserver/qbittorrent",
+		"architecture":"x86-64",
+		"firmware":"3.5.0"
+	},
+	"adm-desktop":{
+		"app":{
+			"port": 18181,
+			"protocol": "http",
+			"type": "custom",
+			"url": "/" 
+		},
+		"privilege":{
+			"accessible": "administrators", 
+			"customizable": true 
+		} 
+	},
+	"register":{
+		"share-folder":[
+			{
+				"name":"Docker",
+				"description":"Data and files directory for Docker Apps"
+			},         	
+			{
+				"name":"Download",
+				"description":"Download default shared folder"
+			}         	
+		],
+		"boot-priority":{
+			"start-order":75,
+			"stop-order":25
+		},
+		"port":[18181]
+	}
+}
